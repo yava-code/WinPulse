@@ -75,6 +75,10 @@ public partial class SettingsWindow : Window
         {
             if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Pressed)
             {
+                if (e.OriginalSource is DependencyObject dep && FindVisualParent<Button>(dep) != null)
+                {
+                    return;
+                }
                 try { DragMove(); } catch { }
             }
         };
@@ -718,5 +722,15 @@ public partial class SettingsWindow : Window
             e.Cancel = true;
             Hide();
         }
+    }
+
+    private static T? FindVisualParent<T>(DependencyObject? child) where T : DependencyObject
+    {
+        while (child != null)
+        {
+            if (child is T parent) return parent;
+            child = System.Windows.Media.VisualTreeHelper.GetParent(child);
+        }
+        return null;
     }
 }

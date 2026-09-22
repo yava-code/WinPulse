@@ -1,11 +1,20 @@
 namespace Pulse.Windows.SystemIntegration;
 
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Pulse.Core.Services;
 
 public sealed class TrayIconManager : IDisposable
 {
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
+
     private readonly NotifyIcon _notifyIcon;
     private readonly UsageStore _usageStore;
     private readonly Action _onOpenSettings;
@@ -23,27 +32,52 @@ public sealed class TrayIconManager : IDisposable
         _onTogglePanel = onTogglePanel;
         _onExit = onExit;
 
-        var contextMenu = new ContextMenuStrip();
+        var contextMenu = new ContextMenuStrip
+        {
+            ShowImageMargin = false,
+            ShowCheckMargin = false,
+            BackColor = Color.FromArgb(24, 24, 28),
+            ForeColor = Color.FromArgb(235, 235, 240),
+            Font = new Font("Segoe UI", 9.5f, FontStyle.Regular),
+            Renderer = new DarkPulseMenuRenderer()
+        };
 
-        var titleItem = new ToolStripMenuItem("Pulse") { Enabled = false };
-        titleItem.Font = new Font(titleItem.Font, FontStyle.Bold);
+        // Enable Windows 11 rounded corners on popup
+        contextMenu.HandleCreated += (s, e) =>
+        {
+            try
+            {
+                int cornerVal = DWMWCP_ROUND;
+                DwmSetWindowAttribute(contextMenu.Handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerVal, sizeof(int));
+            }
+            catch { }
+        };
+
+        // Title Header
+        var titleItem = new ToolStripMenuItem("Pulse") { Enabled = false, Tag = "Title" };
+        titleItem.Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
         contextMenu.Items.Add(titleItem);
         contextMenu.Items.Add(new ToolStripSeparator());
 
-        var toggleItem = new ToolStripMenuItem("Show / Hide Panel", null, (_, _) =>
+        // Toggle Panel
+        var toggleItem = new ToolStripMenuItem("Показать / скрыть панель", null, (_, _) =>
         {
             _onTogglePanel();
         });
         contextMenu.Items.Add(toggleItem);
 
-        var settingsItem = new ToolStripMenuItem("Settings...", null, (_, _) =>
+        // Settings
+        var settingsItem = new ToolStripMenuItem("Настройки...", null, (_, _) =>
         {
             _onOpenSettings();
-        });
-        settingsItem.Font = new Font(settingsItem.Font, FontStyle.Bold);
+        })
+        {
+            Font = new Font("Segoe UI", 9.5f, FontStyle.Bold)
+        };
         contextMenu.Items.Add(settingsItem);
 
-        var refreshItem = new ToolStripMenuItem("Refresh Quotas", null, async (_, _) =>
+        // Refresh
+        var refreshItem = new ToolStripMenuItem("Обновить квоты", null, async (_, _) =>
         {
             await _usageStore.RefreshAllAsync();
         });
@@ -51,16 +85,19 @@ public sealed class TrayIconManager : IDisposable
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
-        var exitItem = new ToolStripMenuItem("Quit Pulse", null, (_, _) =>
+        // Quit Pulse
+        var exitItem = new ToolStripMenuItem("Выход", null, (_, _) =>
         {
             _onExit();
-        });
-        exitItem.ForeColor = Color.FromArgb(220, 50, 50);
+        })
+        {
+            Tag = "Quit"
+        };
         contextMenu.Items.Add(exitItem);
 
         _notifyIcon = new NotifyIcon
         {
-            Text = "Pulse - AI Quota Monitor",
+            Text = "Pulse — Монитор лимитов AI",
             ContextMenuStrip = contextMenu
         };
 
@@ -87,7 +124,7 @@ public sealed class TrayIconManager : IDisposable
     {
         try
         {
-            _notifyIcon.ShowBalloonTip(3000, "Pulse", "Pulse is active. Click icon to open settings, right-click for options.", ToolTipIcon.Info);
+            _notifyIcon.ShowBalloonTip(3000, "Pulse", "Pulse запущен. Нажмите для открытия настроек, правый клик — меню.", ToolTipIcon.Info);
         }
         catch { }
     }
@@ -140,7 +177,7 @@ public sealed class TrayIconManager : IDisposable
             using var bitmap = new Bitmap(size.Width, size.Height);
             using (var g = Graphics.FromImage(bitmap))
             {
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.Clear(Color.Transparent);
 
                 using var bgBrush = new SolidBrush(Color.FromArgb(240, 20, 20, 24));
@@ -173,5 +210,99 @@ public sealed class TrayIconManager : IDisposable
             _notifyIcon.Dispose();
         }
         catch { }
+    }
+
+    /// <summary>
+    /// Custom sleek dark mode renderer for Windows 11 / macOS dark aesthetic.
+    /// </summary>
+    private sealed class DarkPulseMenuRenderer : ToolStripRenderer
+    {
+        private static readonly Color BgColor = Color.FromArgb(24, 24, 28);       // #18181C
+        private static readonly Color BorderColor = Color.FromArgb(46, 46, 56);   // #2E2E38
+        private static readonly Color HoverBg = Color.FromArgb(44, 44, 54);       // #2C2C36
+        private static readonly Color HoverQuitBg = Color.FromArgb(70, 22, 26);   // Soft dark crimson
+        private static readonly Color NormalText = Color.FromArgb(235, 235, 240);
+        private static readonly Color MutedText = Color.FromArgb(135, 135, 145);
+        private static readonly Color QuitText = Color.FromArgb(255, 95, 95);
+        private static readonly Color SeparatorColor = Color.FromArgb(42, 42, 50);
+
+        protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
+        {
+            using var brush = new SolidBrush(BgColor);
+            e.Graphics.FillRectangle(brush, e.AffectedBounds);
+        }
+
+        protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+        {
+            using var pen = new Pen(BorderColor, 1);
+            e.Graphics.DrawRectangle(pen, 0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
+        }
+
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+        {
+            if (!e.Item.Enabled) return;
+
+            if (e.Item.Selected)
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                bool isQuit = e.Item.Tag as string == "Quit";
+                using var brush = new SolidBrush(isQuit ? HoverQuitBg : HoverBg);
+
+                var rect = new Rectangle(4, 1, e.Item.Width - 8, e.Item.Height - 2);
+                using var path = CreateRoundedRectangle(rect, 4);
+                e.Graphics.FillPath(brush, path);
+            }
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+
+            bool isTitle = e.Item.Tag as string == "Title";
+            bool isQuit = e.Item.Tag as string == "Quit";
+
+            Color textColor;
+            if (!e.Item.Enabled || isTitle)
+            {
+                textColor = MutedText;
+            }
+            else if (isQuit)
+            {
+                textColor = e.Item.Selected ? Color.FromArgb(255, 130, 130) : QuitText;
+            }
+            else
+            {
+                textColor = e.Item.Selected ? Color.White : NormalText;
+            }
+
+            // Left padding 14px for sleek alignment
+            var textRect = new Rectangle(14, e.TextRectangle.Y, e.Item.Width - 28, e.TextRectangle.Height);
+            TextRenderer.DrawText(
+                e.Graphics,
+                e.Text,
+                e.TextFont,
+                textRect,
+                textColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
+        }
+
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
+        {
+            int y = e.Item.Height / 2;
+            using var pen = new Pen(SeparatorColor, 1);
+            e.Graphics.DrawLine(pen, 10, y, e.Item.Width - 10, y);
+        }
+
+        private static GraphicsPath CreateRoundedRectangle(Rectangle rect, int radius)
+        {
+            var path = new GraphicsPath();
+            int d = radius * 2;
+            path.AddArc(rect.X, rect.Y, d, d, 180, 90);
+            path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
+            path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
+            path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
     }
 }
