@@ -135,7 +135,35 @@ Pulse shows the figures each service reports, and every percentage comes from th
 ## 🪟 Pulse for Windows (Native Port)
 
 ### Overview
-This repository contains a full 1:1 native Windows port of **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**. It recreates the fluid screen-edge experience, live quota monitoring, animated mascot physics, and developer tooling using native **C# 13, .NET 10, WPF, and Win32 / DWM integration**.
+This repository contains a full 1:1 native Windows port and fork of **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**. It recreates the fluid screen-edge experience, live quota monitoring, animated mascot physics, and developer tooling using native **C# 13, .NET 10, WPF, and Win32 / DWM integration**.
+
+### 📸 Windows Screenshots
+<p align="center">
+  <img src="Docs/images/windows-settings-general.png" width="48%" alt="Pulse Settings - General" />
+  &nbsp;
+  <img src="Docs/images/windows-settings-accounts.png" width="48%" alt="Pulse Settings - Accounts & Usage" />
+</p>
+<p align="center">
+  <img src="Docs/images/windows-floating-rail.png" height="340" alt="Screen-edge floating rail with BotMark mascot rings" />
+  <br>
+  <em>Screen-Edge Floating Capsule Dock with BotMark Animated Mascot Status Rings</em>
+</p>
+
+### ⚡ Quick Install (One Command)
+Install and run Pulse on Windows with a single PowerShell command:
+```powershell
+irm https://raw.githubusercontent.com/yava-code/WinPulse/main/install.ps1 | iex
+```
+*This downloads the latest release, installs it to `%LOCALAPPDATA%\Pulse`, creates Start Menu and Desktop shortcuts, and starts Pulse.*
+
+### 📦 Pre-built Binaries & Releases
+Download standalone or portable binaries directly from [GitHub Releases](https://github.com/yava-code/WinPulse/releases/latest):
+
+| Asset | Type | Description |
+| :--- | :--- | :--- |
+| **`Pulse.Windows.exe`** | **Standalone Single-File** | **Zero dependencies required!** Works immediately on any Windows 10/11 machine. |
+| **`Pulse-Windows-x64.zip`** | Standalone Archive | Portable distribution archive containing `Pulse.Windows.exe`. |
+| **`Pulse-Windows-x64-framework-dependent.zip`** | Lightweight Package (~2 MB) | For users with [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download) installed. |
 
 ### Windows-Specific Capabilities
 - **Desktop Window Manager (DWM) Integration**: Custom Win32 window styles (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`) ensure the floating capsule stays unobtrusively on top of your full-screen code editors without ever stealing active keyboard focus or breaking window state.
@@ -143,39 +171,61 @@ This repository contains a full 1:1 native Windows port of **[Pulse by qunqin24]
 - **BotMark Mascot Physics Engine**: Native vector port of the BotMark animated mascot face, reacting dynamically to quota status (Working, Quiet, Spent, Unavailable) with authentic squash-and-stretch eye/body kinematics.
 - **Windows DPAPI Credential Store**: Replaces macOS Keychain with hardware-backed Windows Data Protection API (`ProtectedData`), securely storing API keys and tokens scoped strictly to your Windows user account.
 - **Multi-Account Dynamic Discovery**: Automatically scans and detects Antigravity sessions, Claude Code, Cursor, Codex, and Copilot configs directly from local Windows developer paths (`%APPDATA%`, `%USERPROFILE%`).
-- **System Notification Area (Tray)**: Dedicated Windows system tray icon with one-click settings access, quota refresh, and rail visibility toggle.
+- **System Notification Area (Tray)**: Dedicated Windows system tray icon with one-click settings access, quota refresh, and rail visibility toggle in English.
 - **Guaranteed Process Lifecycle**: Clean single-instance enforcement kills previous hung background processes upon launch, exits cleanly with immediate process-tree cleanup, and supports `Ctrl+Q` global exit.
 - **Scriptable CLI Mode**: Run `Pulse.Windows.exe --json` for lightweight status bar integration (e.g. Komorebi, GlazeWM, Zebar, or custom PowerShell scripts) without running the GUI.
 
-### Windows Build & Run
+### 🛠️ Build & Commit Guide
 
 #### Prerequisites
 - Windows 10 (1809+) or Windows 11 (x64 / ARM64)
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
 
-#### Quick Start
+#### 1-Command Local Build
 ```powershell
-# 1. Navigate to the Windows port directory
-cd Windows
+# Build standalone self-contained executable & zip into dist/
+.\build.ps1
 
-# 2. Build Release binary
-dotnet build Pulse.Windows/Pulse.Windows.csproj -c Release
+# Or build lightweight framework-dependent package
+.\build.ps1 -FrameworkDependent
+```
 
-# 3. Run all automated unit tests (34 tests passing)
-dotnet test Pulse.Tests/Pulse.Tests.csproj
+#### Manual dotnet CLI Build & Test
+```powershell
+# 1. Restore dependencies
+dotnet restore Windows/Pulse.slnx
 
-# 4. Launch Pulse
-dotnet run --project Pulse.Windows/Pulse.Windows.csproj
+# 2. Run automated unit tests (34 tests passing)
+dotnet test Windows/Pulse.slnx
+
+# 3. Publish standalone single-file Release binary
+dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist/
 ```
 
 #### Command Line Options
 ```powershell
 # Print current cached quota readings as JSON (zero background overhead)
-.\bin\Release\net10.0-windows\Pulse.Windows.exe --json
+.\dist\Pulse.Windows.exe --json
 
 # Launch in console debug mode to inspect real-time provider sync logs
-.\bin\Release\net10.0-windows\Pulse.Windows.exe --debug
+.\dist\Pulse.Windows.exe --debug
+
+# Start directly to system tray and floating rail without opening Settings window
+.\dist\Pulse.Windows.exe --minimized
 ```
+
+#### Commits & Releases
+1. **Commit Changes**: Use semantic commit messages:
+   ```powershell
+   git add .
+   git commit -m "feat: add feature description"
+   git push winpulse main
+   ```
+2. **Tag a Release**: Pushing a version tag automatically triggers GitHub Actions to build standalone and lightweight release binaries and attach them to GitHub Releases:
+   ```powershell
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   git push winpulse v1.0.0
+   ```
 
 ---
 

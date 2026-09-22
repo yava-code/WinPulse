@@ -30,20 +30,20 @@ public sealed class TrayIconManager : IDisposable
         contextMenu.Items.Add(titleItem);
         contextMenu.Items.Add(new ToolStripSeparator());
 
-        var toggleItem = new ToolStripMenuItem("Показать / скрыть панель", null, (_, _) =>
+        var toggleItem = new ToolStripMenuItem("Show / Hide Panel", null, (_, _) =>
         {
             _onTogglePanel();
         });
         contextMenu.Items.Add(toggleItem);
 
-        var settingsItem = new ToolStripMenuItem("Настройки...", null, (_, _) =>
+        var settingsItem = new ToolStripMenuItem("Settings...", null, (_, _) =>
         {
             _onOpenSettings();
         });
         settingsItem.Font = new Font(settingsItem.Font, FontStyle.Bold);
         contextMenu.Items.Add(settingsItem);
 
-        var refreshItem = new ToolStripMenuItem("Обновить квоты", null, async (_, _) =>
+        var refreshItem = new ToolStripMenuItem("Refresh Quotas", null, async (_, _) =>
         {
             await _usageStore.RefreshAllAsync();
         });
@@ -51,7 +51,7 @@ public sealed class TrayIconManager : IDisposable
 
         contextMenu.Items.Add(new ToolStripSeparator());
 
-        var exitItem = new ToolStripMenuItem("Выход", null, (_, _) =>
+        var exitItem = new ToolStripMenuItem("Quit Pulse", null, (_, _) =>
         {
             _onExit();
         });
@@ -87,7 +87,7 @@ public sealed class TrayIconManager : IDisposable
     {
         try
         {
-            _notifyIcon.ShowBalloonTip(3000, "Pulse", "Pulse запущен и активен. Иконка закреплена в области уведомлений.", ToolTipIcon.Info);
+            _notifyIcon.ShowBalloonTip(3000, "Pulse", "Pulse is active. Click icon to open settings, right-click for options.", ToolTipIcon.Info);
         }
         catch { }
     }

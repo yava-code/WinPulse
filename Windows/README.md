@@ -14,69 +14,146 @@
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white" alt=".NET 10.0">
   <img src="https://img.shields.io/badge/UI-WPF%20XAML-0078D6" alt="WPF">
   <img src="https://img.shields.io/badge/Security-DPAPI-green" alt="Windows DPAPI">
+  <a href="https://github.com/yava-code/WinPulse/releases/latest"><img src="https://img.shields.io/github/v/release/yava-code/WinPulse?color=blue&label=Latest%20Release" alt="Latest Release"></a>
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License">
 </p>
 
 ---
 
-## Attribution & Origins
-This project is an authentic, 1:1 native Windows port and fork of the macOS application **[Pulse](https://github.com/qunqin24/Pulse)** created by [qunqin24](https://github.com/qunqin24). Original design inspiration credited to [Vinz (@hivinz_)](https://x.com/hivinz_).
+## 📸 Screenshots
+
+<p align="center">
+  <img src="../Docs/images/windows-settings-general.png" width="48%" alt="Pulse Settings - General" />
+  &nbsp;
+  <img src="../Docs/images/windows-settings-accounts.png" width="48%" alt="Pulse Settings - Accounts & Usage" />
+</p>
+
+<p align="center">
+  <img src="../Docs/images/windows-floating-rail.png" height="360" alt="Screen-edge floating rail with BotMark mascot rings" />
+  <br>
+  <em>Screen-Edge Floating Capsule Dock with BotMark Animated Mascot Status Rings</em>
+</p>
 
 ---
 
-## Features
-- **Unobtrusive Screen-Edge Rail**: Docks to the right or left edge of your screen with smooth auto-collapse into an ultra-thin sliver bar.
-- **BotMark Mascot Physics**: 1:1 vector implementation of the BotMark animated mascot face reacting with squash-and-stretch kinematics to quota exhaustion and active agent states.
-- **Accurate Quota Progress**: Proportional progress bars ensuring 100% exhaustion accurately fills 100% of the visual track at any screen scaling or resolution.
-- **Liquid Glass & Obsidian Themes**: Native DirectX layered alpha compositing support for frosted glass without rectangular artifacts or window clipping bugs.
-- **Windows DPAPI Storage**: Credentials, API tokens, and OAuth keys are encrypted using the Windows Data Protection API (`ProtectedData.Protect`), hardware-backed and scoped strictly to your user profile.
+## ⚡ Quick Install (One Command)
+
+You can install Pulse for Windows with a single PowerShell command. This downloads the latest release, installs it to `%LOCALAPPDATA%\Pulse`, creates Start Menu and Desktop shortcuts, and starts the application:
+
+```powershell
+irm https://raw.githubusercontent.com/yava-code/WinPulse/main/install.ps1 | iex
+```
+
+---
+
+## 📦 Direct Downloads
+
+Pre-built binaries are published with every release on [GitHub Releases](https://github.com/yava-code/WinPulse/releases/latest):
+
+| Asset | Description | Requirements |
+| :--- | :--- | :--- |
+| **`Pulse.Windows.exe`** | **Standalone Single-File Executable** | **Zero dependencies!** Works directly on any Windows 10/11 (x64 / ARM64). |
+| **`Pulse-Windows-x64.zip`** | **Standalone Portable Archive** | Unpack and run anywhere with zero installation. |
+| **`Pulse-Windows-x64-framework-dependent.zip`** | Lightweight Package (~2 MB) | Requires [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download). |
+
+---
+
+## 🌟 Key Features
+
+- **Unobtrusive Screen-Edge Rail**: Docks seamlessly to the right, left, or floats freely. Smoothly auto-collapses into an ultra-thin sliver bar against the edge until hovered.
+- **BotMark Mascot Kinematics**: 1:1 vector implementation of the BotMark animated mascot face reacting with squash-and-stretch physics to quota exhaustion, active agent turns, and cooldowns.
+- **Accurate Quota Progress**: Proportional progress bars ensuring 100% exhaustion accurately fills 100% of the visual track at any screen scaling (100%, 125%, 150%, 200%).
+- **Liquid Glass & Obsidian Dark Themes**: Native DirectX layered alpha compositing support for frosted glass without window clipping or rectangular visual artifacts.
+- **Windows DPAPI Security**: Credentials, API tokens, and OAuth keys are encrypted using the Windows Data Protection API (`ProtectedData.Protect`), hardware-backed and scoped strictly to your user profile.
 - **Multi-Account Discovery**: Dynamic discovery of multiple Antigravity sessions and local config credentials (`%APPDATA%`, `%USERPROFILE%`, Claude Code, Codex, Cursor).
-- **System Tray Integration**: Full notification area support with live status, quota refresh, and quick settings toggling.
-- **Rock-Solid Lifecycle**: Kills previous zombie/hung background instances upon start, and forcibly cleans up its own process tree upon exit (`Ctrl+Q`, tray exit, or Settings quit).
+- **System Tray Integration**: Full English notification area menu with live status, quota refresh, and quick settings toggling.
+- **Clean Lifecycle**: Kills previous zombie/hung background instances upon start, and forcibly cleans up its own process tree upon exit (`Ctrl+Q`, tray exit, or Settings quit).
 - **Zero-GUI CLI Mode**: Run `Pulse.Windows.exe --json` for lightweight scripting with tmux, Komorebi, or custom terminal statusbars.
 
 ---
 
-## Solution Structure
-- **`Pulse.Core`**: Shared .NET 10 class library containing:
-  - Account and usage models (`ProviderUsage`, `UsageWindow`, `AccountKey`)
-  - Provider service integrations (`Antigravity`, `ClaudeCode`, `Codex`, `Cursor`, `Copilot`, `Grok`, `DeepSeek`, etc.)
-  - DPAPI credential store interfaces and OAuth authentication flows
-  - BotMark mascot mood and persona state engines
-- **`Pulse.Windows`**: Native WPF desktop application:
-  - `FloatingRailWindow`: Screen-edge floating capsule window
-  - `SettingsWindow`: macOS-style multi-pane preferences window
-  - `Controls/`: BotMark vector canvas, usage rings, and detail popup cards
-  - `Platform/`: Theme management and icon geometry
-  - `SystemIntegration/`: Win32/DWM window styling and system tray manager
-- **`Pulse.Tests`**: Automated unit test suite verifying rate limit parsers, tint algorithms, and DPAPI encryption.
-
----
-
-## Getting Started
+## 🛠️ Build & Development Guide
 
 ### Prerequisites
-- Windows 10 (Build 1809+) or Windows 11
-- [.NET 10 SDK](https://dotnet.microsoft.com/)
+- Windows 10 (Build 1809+) or Windows 11 (x64 / ARM64)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
 
-### Building and Running
+### 1-Command Local Build & Test
+Use the included automated build script from the repository root:
+
 ```powershell
-# Restore & build Release binary
-dotnet build Pulse.Windows/Pulse.Windows.csproj -c Release
+# Build standalone self-contained executable & zip into dist/
+.\build.ps1
 
-# Run automated tests
-dotnet test Pulse.Tests/Pulse.Tests.csproj
+# Or build lightweight framework-dependent package
+.\build.ps1 -FrameworkDependent
+```
 
-# Run application
-dotnet run --project Pulse.Windows/Pulse.Windows.csproj
+### Manual dotnet CLI Build
+```powershell
+# Restore dependencies
+dotnet restore Windows/Pulse.slnx
+
+# Run all 34 automated unit tests
+dotnet test Windows/Pulse.slnx
+
+# Publish standalone single-file Release binary
+dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist/
 ```
 
 ### Command Line Flags
-- `--json`: Dumps the current cached quota readings as JSON to standard output and exits immediately.
-- `--debug` / `-d` / `--console`: Attaches to parent console and prints verbose diagnostic logs during startup and sync.
-- `--minimized` / `--daemon`: Starts directly to system tray and floating rail without displaying the Settings window on launch.
+```powershell
+# Dump current cached quota readings as JSON to standard output and exit
+.\Pulse.Windows.exe --json
+
+# Launch in console debug mode to inspect real-time provider sync logs
+.\Pulse.Windows.exe --debug
+
+# Start directly to system tray and floating rail without opening Settings window
+.\Pulse.Windows.exe --minimized
+```
 
 ---
 
-## License
-Licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). All original assets retain their respective licenses.
+## 🏷️ Commits & Release Guide
+
+### Commit Message Conventions
+Follow Conventional Commits format when creating commits:
+- `feat: add new provider support`
+- `fix: resolve liquid glass clipping on secondary monitor`
+- `docs: update installation instructions and screenshots`
+- `refactor: clean up TrayIconManager lifecycle`
+
+### Pushing Changes
+To push your commits to the repository:
+```powershell
+git add .
+git commit -m "feat: your descriptive message"
+git push winpulse main
+```
+
+### Creating an Automated GitHub Release
+The repository includes an automated GitHub Actions release workflow (`.github/workflows/release.yml`). To create a release:
+
+1. Create a semantic git tag (e.g. `v1.0.0`):
+   ```powershell
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   ```
+2. Push the tag to GitHub:
+   ```powershell
+   git push winpulse v1.0.0
+   ```
+3. GitHub Actions will automatically:
+   - Restore and build on `windows-latest`
+   - Run the automated unit test suite
+   - Publish both standalone self-contained and framework-dependent binaries
+   - Create a GitHub Release and attach `Pulse.Windows.exe`, `Pulse-Windows-x64.zip`, and `Pulse-Windows-x64-framework-dependent.zip`.
+
+---
+
+## 📜 Attribution & License
+
+- **Port & Windows Implementation**: Forked and maintained in [yava-code/WinPulse](https://github.com/yava-code/WinPulse).
+- **Original macOS Application**: Created by [qunqin24](https://github.com/qunqin24) at [qunqin24/Pulse](https://github.com/qunqin24/Pulse).
+- **Design Inspiration**: Credited to [Vinz (@hivinz_)](https://x.com/hivinz_).
+- **License**: Licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).

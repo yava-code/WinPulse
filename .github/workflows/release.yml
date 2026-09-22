@@ -1,198 +1,66 @@
 name: Release
 
-# Tag and push, and that is the whole publishing step:
-#
-#   ./Scripts/bundle.sh   (locally, to check it)
-#   git tag v1.0.1 && git push origin v1.0.1
-#
-# Pulse's own update check reads GitHub's latest release, so what this
-# publishes is exactly what installed copies are offered.
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - 'v*'
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Existing tag to build and publish"
-        required: true
 
 permissions:
   contents: write
 
 jobs:
-  release:
-    runs-on: macos-26
+  build-and-release-windows:
+    name: Build & Release Windows (x64)
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          # Release notes are generated from the history between tags.
-          fetch-depth: 0
+          dotnet-version: '10.0.x'
 
-      # The version lives in VERSION and the tag has to agree with it: the
-      # update check compares the published tag against the bundle's
-      # CFBundleShortVersionString, which is read from that file. Mismatched,
-      # every installed copy would be told forever that an update is waiting.
-      - name: Tag and VERSION must agree
+      - name: Add NuGet source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+
+      - name: Restore dependencies
+        run: dotnet restore Windows/Pulse.slnx
+
+      - name: Run unit tests
+        run: dotnet test Windows/Pulse.slnx --configuration Release --no-restore --verbosity normal
+
+      - name: Publish Windows x64 (Standalone Self-Contained)
         run: |
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          TAG="${TAG#v}"
-          FILE="$(tr -d '[:space:]' < VERSION)"
-          echo "tag=$TAG  VERSION=$FILE"
-          if [ "$TAG" != "$FILE" ]; then
-            echo "::error::Tag v$TAG does not match VERSION ($FILE). Bump VERSION, commit, then re-tag."
-            exit 1
-          fi
-          echo "VERSION=$FILE" >> "$GITHUB_ENV"
+          dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/Pulse-Windows-x64-Standalone
 
-      # Before anything is built or published, so a missing entry costs a
-      # re-tag rather than a release whose notes went out wrong. These words
-      # reach the update window of every installed copy; the fallback in
-      # Scripts/appcast.py is for older versions and hand runs, not for this.
-      - name: The changelog has an entry for this version
+      - name: Publish Windows x64 (Framework-Dependent)
         run: |
-          if ! Scripts/changelog.py "$VERSION" > /dev/null 2>&1; then
-            echo "::error::CHANGELOG.md has no '## $VERSION' entry. Write it, commit, then re-tag."
-            exit 1
-          fi
+          dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/Pulse-Windows-x64-Lightweight
 
-          # And that it has both language sections, because the page is built
-          # from them. An entry missing its `**English**` marker still passes
-          # the check above and then publishes a page with one section and a
-          # language nav pointing at an anchor that is not there.
-          NOTES="$(Scripts/changelog.py "$VERSION" --release-notes)"
-          for ANCHOR in cn en; do
-            if ! printf '%s' "$NOTES" | grep -q "id=\"$ANCHOR-pulse-$VERSION\""; then
-              echo "::error::The $VERSION entry has no '$ANCHOR' section. Both **中文** and **English** are needed."
-              exit 1
-            fi
-          done
-
-      - name: Check the SDK is new enough
+      - name: Compress Release Archives & Prepare Artifacts
+        shell: pwsh
         run: |
-          SDK="$(xcrun --sdk macosx --show-sdk-version | cut -d. -f1)"
-          if [ "$SDK" -lt 26 ]; then
-            echo "::error::macOS SDK $SDK is too old — PanelSurface needs 26 for glassEffect."
-            exit 1
-          fi
+          # Copy standalone exe to root for direct one-click download
+          Copy-Item publish/Pulse-Windows-x64-Standalone/Pulse.Windows.exe ./Pulse.Windows.exe
 
-      - name: Localization keys
-        run: ./Scripts/check-localization.sh
+          # Create standalone zip archive
+          Compress-Archive -Path publish/Pulse-Windows-x64-Standalone/* -DestinationPath Pulse-Windows-x64.zip
 
-      - name: Build
-        run: |
-          set -o pipefail
-          swift build -Xswiftc -swift-version -Xswiftc 6 2>&1 | tee build.log
-          if grep -q "warning:" build.log; then
-            echo "::error::The build produced warnings, which this project treats as failures."
-            grep "warning:" build.log | head -40
-            exit 1
-          fi
+          # Create lightweight zip archive
+          Compress-Archive -Path publish/Pulse-Windows-x64-Lightweight/* -DestinationPath Pulse-Windows-x64-framework-dependent.zip
 
-      # A tag publishes to everyone who has the app installed. The tests are
-      # the last thing standing between a regression in the rules and a
-      # Sparkle update, so they run here too rather than only on push.
-      - name: Tests
-        run: swift test -Xswiftc -swift-version -Xswiftc 6
-
-      # The disk image carries the install instructions on its window, so it is
-      # the download people should get; the zip is there for anything that
-      # would rather have an archive.
-      - name: Package
-        run: |
-          ./Scripts/dmg.sh
-          ./Scripts/bundle.sh --zip
-          ls -lh build.noindex/
-
-      - name: Release notes
-        run: |
-          # The whole page, assembled from the same entry the update window
-          # shows so the two cannot drift apart. Its presence was checked
-          # before anything was built.
-          #
-          # **Assembled by the script, not here.** This step used to staple
-          # the entry to a hard-coded English install block and GitHub's
-          # generated commit list, which is not the shape the pages before it
-          # had — so each release was reformatted by hand afterwards, or left
-          # looking different from its neighbours. The language sections, the
-          # anchors, the upgrade line, the install block in each language and
-          # the compare link now all come out of `changelog.py`.
-          Scripts/changelog.py "$VERSION" --release-notes > notes.md
-
-      - name: Publish
-        id: publish
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # A tag like v1.1.0-beta.1 is published as a pre-release, which
-          # GitHub's "latest release" excludes — and so, therefore, does
-          # Pulse's update check.
-          PRERELEASE=""
-          case "$VERSION" in *-*) PRERELEASE="--prerelease";; esac
-
-          # Re-runnable. A later step failing used to mean deleting the release
-          # and the tag and starting over, which is a lot of ceremony for a
-          # typo in the step after this one.
-          if gh release view "v$VERSION" >/dev/null 2>&1; then
-            echo "Release exists — replacing its assets."
-            gh release upload "v$VERSION" \
-              "build.noindex/Pulse-$VERSION.dmg" \
-              "build.noindex/Pulse-$VERSION.zip" \
-              --clobber
-          else
-            gh release create "v$VERSION" \
-              "build.noindex/Pulse-$VERSION.dmg" \
-              "build.noindex/Pulse-$VERSION.zip" \
-              --title "Pulse $VERSION" \
-              --notes-file notes.md \
-              $PRERELEASE
-          fi
-
-      # After publishing, because the feed points at the release's own asset —
-      # committing it first would advertise a download that 404s.
-      #
-      # This is what makes updates *install themselves*. Sparkle refuses an
-      # archive that isn't signed by the private half of the key whose public
-      # half is baked into the app, so the signature written here is the whole
-      # trust story: it holds even though the app carries only an ad-hoc
-      # signature and Apple has vouched for nothing.
-      - name: Offer it to Sparkle
-        env:
-          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-        run: |
-          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
-            echo "::error::SPARKLE_PRIVATE_KEY is not set — installed copies would never see this release."
-            exit 1
-          fi
-
-          URL="https://github.com/${{ github.repository }}/releases/download/v$VERSION/Pulse-$VERSION.zip"
-
-          # The tag was checked out detached; the feed lives on main.
-          git fetch origin main
-          git checkout -B main origin/main
-
-          Scripts/appcast.py "$VERSION" "build.noindex/Pulse-$VERSION.zip" "$URL"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add appcast.xml
-
-          # Staged first, and compared against the index rather than the
-          # working tree: `git diff` only looks at *tracked* files, so on the
-          # very first release — when the feed is brand new — it reported no
-          # change, the step exited green, and nothing was ever committed. A
-          # step that succeeds without doing its job is the worst kind.
-          if git diff --cached --quiet -- appcast.xml; then
-            echo "Feed already offers $VERSION."
-          else
-            git commit -m "Offer $VERSION to Sparkle"
-            git push origin main
-          fi
-
-          # Say it out loud rather than trusting the step's own exit code.
-          if ! git show HEAD:appcast.xml | grep -q "<sparkle:shortVersionString>$VERSION<"; then
-            echo "::error::appcast.xml on main does not offer $VERSION — installed copies would never see it."
-            exit 1
-          fi
-          echo "Feed on main offers $VERSION."
+      - name: Create GitHub Release & Upload Assets
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          name: Pulse for Windows ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            Pulse.Windows.exe
+            Pulse-Windows-x64.zip
+            Pulse-Windows-x64-framework-dependent.zip
