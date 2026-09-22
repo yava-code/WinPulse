@@ -90,8 +90,7 @@ public sealed class BotMarkLibrary
             {
                 Path.Combine(AppContext.BaseDirectory, "Resources", "bot-data.json"),
                 Path.Combine(AppContext.BaseDirectory, "bot-data.json"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Windows", "Pulse.Core", "Resources", "bot-data.json"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Sources", "Pulse", "Resources", "bot-data.json")
+                Path.Combine(Directory.GetCurrentDirectory(), "Windows", "Pulse.Core", "Resources", "bot-data.json")
             };
 
             foreach (var p in candidatePaths)

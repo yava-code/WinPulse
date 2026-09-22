@@ -1,187 +1,133 @@
 <p align="center">
-  <img src="AppIcon/pulse-icon-1024.png" width="112" alt="Pulse">
+  <img src="AppIcon/pulse-icon-1024.png" width="100" alt="Pulse for Windows">
 </p>
 
-<h1 align="center">Pulse</h1>
+<h1 align="center">Pulse for Windows (WinPulse)</h1>
 
 <p align="center">
-  <b>A lightweight, elegant screen-edge monitor for your AI coding allowances.</b><br>
-  Real-time remaining quotas and rate limits for Claude Code, Codex, Cursor, GitHub Copilot, Antigravity, Grok, and more.
+  <b>A lightweight, elegant screen-edge monitor for your AI coding allowances on Windows.</b><br>
+  Real-time remaining quotas and rate limits for Antigravity, Claude Code, Codex, Cursor, GitHub Copilot, Grok, DeepSeek, and more.
 </p>
 
-> [!IMPORTANT]
-> ### 🪟 Windows Port & Fork Notice
-> This repository is a native Windows port and fork of the original macOS project **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**.
-> It brings the entire Pulse experience (floating screen-edge dock, animated BotMark mascot rings, live rate limit monitoring, and multi-account token spend) to **Microsoft Windows 10 & 11** built with **C# / .NET 10 & WPF**.
-> 
-> 👉 **[Jump to Windows Port Documentation & Build Guide](#-pulse-for-windows-native-port)**
-
 <p align="center">
-  <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-0078D6?logo=windows&logoColor=white" alt="Windows 10/11">
+  <a href="https://github.com/yava-code/WinPulse/releases/latest"><img src="https://img.shields.io/github/v/release/yava-code/WinPulse?color=0078D6&label=Latest%20Release" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0078D6?logo=windows&logoColor=white" alt="Windows 10/11">
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white" alt=".NET 10.0">
-  <img src="https://img.shields.io/badge/WPF-Desktop-0078D6" alt="WPF">
-  <img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma-333333?logo=apple" alt="macOS 14+">
+  <img src="https://img.shields.io/badge/UI-WPF%20XAML-0078D6" alt="WPF">
+  <img src="https://img.shields.io/badge/Security-Windows%20DPAPI-green" alt="Windows DPAPI">
+  <a href="https://github.com/qunqin24/Pulse"><img src="https://img.shields.io/badge/Fork%20of-qunqin24%2FPulse-orange" alt="Original macOS Pulse"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License"></a>
-  <a href="https://github.com/qunqin24/Pulse"><img src="https://img.shields.io/badge/Upstream-qunqin24%2FPulse-orange" alt="Upstream Repository"></a>
-</p>
-
-<p align="center">
-  <sub><b>Native Windows 10/11 (.NET 10 / WPF)</b> & <b>macOS 14+ Sonoma (Swift 6)</b> · <b>English</b> · <a href="README.zh-CN.md"><b>简体中文</b></a> · <a href="README.zh-Hant.md"><b>繁體中文</b></a> · <a href="README.ja.md"><b>日本語</b></a> · <a href="README.ko.md"><b>한국어</b></a></sub>
-</p>
-
-<p align="center">
-  <img src="Docs/demo.gif" width="340" alt="Pulse floating rail docked against the screen edge">
-</p>
-
-Pulse is an unobtrusive floating monitor that docks neatly along the edge of your screen. It shows remaining allowance from the figures each service reports — using that product's own client routes, not a Pulse server — signed in as you already are, with nothing reported back. Every percentage on screen is a figure the service itself reported.
-
-**New in 1.2.0:** an optional animated mark in place of a provider's logo — a small bot that reacts to what that account is doing, with its own personality, shape and colour. [Release notes](https://github.com/qunqin24/Pulse/releases/tag/v1.2.0).
-
-<p align="center">
-  <img src="Docs/bot-mark.gif" width="340" alt="Pulse animated marks: a bot in each ring reacting to what that account is doing">
 </p>
 
 ---
 
-## Key Features
-
-### At-a-Glance Status Rings
-- **Usage-Aware Colors**: Dynamic color gradients shift from green to amber, red, and deep red when exhausted — or set custom accent colors per account.
-- **Active Turn Indicator**: A subtle revolving dot indicates whether an agent is actively generating responses in real-time (Claude Code & Codex).
-- **Elapsed Window Arc**: An optional secondary outer arc visualizes how much time in the current rate-limit window has elapsed.
-- **Countdown Mode**: Toggle between showing spent quota (`75% used`) or remaining balance (`25% left`).
-
-### Hover Details & Smart Forecasting
-- **Complete Limit Breakdown**: Hover over any ring to reveal a detailed card showing every reported quota pool, reset countdowns, and current window status.
-- **Burn-Rate Forecast (Optional)**: When you turn it on, projects whether your current pace will outlast the quota window and shows an estimated time-to-exhaustion (ETA) when risk is detected. Off by default.
-- **Pin Primary Window**: Pin whichever limit matters most to the ring, or let Pulse automatically track the one closest to exhaustion.
-
-### Native, Fluid & Non-Intrusive
-- **Flexible Edge Docking**: Dock to the left, right, or top of your screen (above the menu bar), or float freely anywhere.
-- **Multi-Monitor Native**: Drag Pulse to any secondary display; it remembers screen placement and gracefully returns if disconnected. Turn on **Follow the active display** and the single rail moves itself to whichever screen your pointer is on.
-- **Auto-Collapse**: Automatically folds into a razor-thin sliver when idle to eliminate distraction, glowing red only when quota runs critically low.
-- **Opt-In Notifications**: You choose which ones to switch on. Get told when a limit passes 75/80/90/95%, when the provider says it is spent, when a window you were warned about comes back, and when several checks in a row fail so the panel is quietly showing older figures, and — for the services that sell prepaid credit — when the balance falls under a figure you set. Each thing is said once: a limit already past the line when you switch this on is mentioned straight away, and again when it resets or gets worse.
-- **Spaces-Friendly**: Keeps to the Space you are working in, leaving full-screen apps to themselves.
-- **macOS Aesthetic**: Classic solid obsidian surface or native **Liquid Glass** on macOS 26+.
-- **Animated Marks (Optional)**: Replace a provider's logo with a small bot that reacts to what that account is doing — working, fetching, spent, or quiet. Off by default and switched on per account, with eight personalities, eighteen body shapes and a colour of your own if you want one.
-- **Rail Menu & Shortcuts**: Right-click the floating rail — or the collapsed sliver; Control-click works too — for a menu with Settings and Quit. In **Settings › General › Shortcuts** you can optionally assign global shortcuts to **Open settings** and **Show or hide the panel**; both are unset until you set one.
-- **Five Interface Languages**: English, Simplified Chinese, Traditional Chinese, Japanese and Korean, with language-aware large-number units: K/M/B, 万/亿, 萬/億, 万/億 and 만/억 respectively.
-
-### Multi-Account & Local Ledger
-- **Multi-Account Support**: Monitor multiple subscriptions for the same provider (Claude Code, Codex, Grok, Grok Bot) side-by-side with custom labels.
-- **Token Spend (Settings-only)**: Off by default. Enable it on the page to scan local records; switching it off stops the scan. Reads local logs, databases and exports from a catalogue of **54 client sources**, including Gemini CLI, Cline, Roo Code, OpenClaw and GitHub Copilot. Cursor, Trae and other export sources need a prior export or capture. These are distinct from the rail's 20 quota providers; support and live-client validation vary by source. [Sources and coverage](Docs/token-spend-sources.md).
-- **Clear Usage Estimates**: Opens on the last 7 days and remembers your chosen span. Costs use published API prices, not subscription charges. Unknown prices stay unavailable, incomplete counts and coarse timing are labelled, and a source that reports no token counters says so.
-- **Model Details & Charts**: Open a model for input/output/cache counts and estimated costs, daily and hourly charts where the records support them, contributions by agent, and sortable, paged detail tables. Point at a chart to read the date or hour and its token count. Unavailable daily or hourly detail is shown as unavailable, not zero.
-- **Twenty Providers**: Claude Code, Codex, Kiro, Antigravity, Cursor, GitHub Copilot, Grok, Grok Bot, OpenCode Go, Kimi Code, Ollama Cloud, z.ai, Zhipu, MiniMax (intl. and mainland), Volcengine, Command Code, DeepSeek, Devin, and Xiaomi Coding Plan.
-- **Scriptable**: `Pulse --json` prints the last readings — plan, every limit, reset times, and how old the figures are — for tmux, sketchybar, Raycast, or a shell prompt. It reads the cache, so polling costs nothing.
-- **Developer Integrations**: Export a Raycast extension and ready-to-configure tmux, sketchybar and shell scripts from Settings. Account links open the right pane directly. [Setup guide](Docs/integrations.md).
-- **Connection Diagnostics**: See the actual reading source, cache use, latest check and fallback outcomes. Contextual actions help reconnect, sign in again or fix credentials; copy a diagnostic report without account details or secrets.
-- **Privacy First**: Pulse runs on your Mac under your own provider logins. It makes three kinds of connection and they are all listed here: the providers you already use, [models.dev](https://models.dev) for public model prices in the token-spend pane, and GitHub/Sparkle for app updates. Provider requests, sign-in exchanges and models.dev use the proxy chosen under Settings › General › Network; supported helper processes receive the same manual proxy. Sparkle update checks always follow macOS system proxy settings.
-
-<p align="center">
-  <img src="Docs/panel.webp" height="300" alt="Detailed usage card beside rail">
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="Docs/settings.webp" height="300" alt="Pulse Settings">
-</p>
-
-<p align="center">
-  <img src="Docs/account-claude-code.webp" height="290" alt="An account pane: every reported limit, the estimated value of what was used, and the local history">
-  &nbsp;&nbsp;
-  <img src="Docs/account-codex.webp" height="290" alt="Another account pane, with the plan, credit balance and limit reset credits it reports">
-</p>
-
-<p align="center">
-  <img src="Docs/spend.webp" height="290" alt="Token spend: total, tokens by kind, and the daily pattern">
-  &nbsp;&nbsp;
-  <img src="Docs/spend-history.webp" height="290" alt="Token spend day by day, by month and by agent">
-</p>
-
-<p align="center">
-  <img src="Docs/spend-agent.webp" height="290" alt="One agent's spending on its own">
-  &nbsp;&nbsp;
-  <img src="Docs/spend-model.webp" height="290" alt="One model's spending, priced by token kind">
-</p>
+> [!NOTE]
+> ### 🪟 Windows Port & Attribution
+> This repository is a native Windows port and fork inspired by **[Pulse for macOS](https://github.com/qunqin24/Pulse)** created by [qunqin24](https://github.com/qunqin24), with UI concept originally designed by [**Vinz** (@hivinz_)](https://x.com/hivinz_).
+> 
+> WinPulse brings the entire Pulse experience to **Windows 10 and 11** built natively in **C# / .NET 10 and WPF**, featuring hardware alpha compositing, screen-edge docking, animated BotMark mascot physics, and exclusive **Antigravity Multi-Profile** support.
 
 ---
 
-## Supported Providers & Data Routes
+## ⚡ Quick Install (One Command)
 
-Pulse shows the figures each service reports, and every percentage comes from that reply itself. Routes differ by product (documented client APIs, editor logins, local language servers, pasted keys) — not one official public quota API for every row. Contributor detail: [Docs/providers/README.md](Docs/providers/README.md).
-
-| Provider | Data Route & Auth Method | Notes |
-|---|---|---|
-| **Claude Code** | Account OAuth usage endpoint; automatic fallbacks to Claude Desktop session & Status Line | Reads existing CLI/Desktop session; auto-falls back seamlessly |
-| **Codex** | Client usage endpoint; fallback to `codex app-server` | Reads local Codex credentials directly |
-| **Kiro** | Native Kiro CLI ACP usage method | Uses Kiro's signed-in CLI session; Pulse never reads or stores Kiro credentials ([details](Docs/providers/kiro.md)) |
-| **Antigravity** | Local Language Server (LSP) | Active while the Antigravity editor is running |
-| **Cursor** | Cursor account usage summary API | Shows fast and slow request pools from existing editor login |
-| **Grok** | Grok Build CLI proxy (`cli-chat-proxy.grok.com`) | Single unified weekly pool shared across all Grok products |
-| **Grok Bot** | Cursor dashboard API | The xAI quota included with Cursor subscriptions |
-| **GitHub Copilot** | GitHub Device Code authentication | Requests the `read:user` scope alone |
-| **OpenCode Go** | API key or existing OpenCode CLI credentials | Fully configurable in Settings |
-| **Kimi Code** | Direct API key | Configured via Settings |
-| **z.ai** | Direct API key | International storefront (`api.z.ai`) |
-| **Zhipu** | Direct API key or saved GLM tooling credentials | Mainland storefront (`open.bigmodel.cn`) |
-| **MiniMax / MiniMax CN** | Direct API key | Supports international (`minimax.io`) & mainland (`minimaxi.com`) |
-| **Ollama Cloud** | Browser session cookie | Read locally from browser. See [Docs/ollama-cloud.md](Docs/ollama-cloud.md) |
-| **Volcengine** | `arkcli` login, else a pasted access-key pair (signed Top OpenAPI) | Ark Coding & Agent plans; on automatic it prefers pasted keys over the CLI |
-| **Command Code** | Pasted key, else the login `cmd auth login` already saved | Credit balance in dollars; monthly plan row marked **estimated** |
-| **DeepSeek** | Pasted key; documented `GET /user/balance` | Prepaid balance only — no allowance; you pick what the ring measures against |
-| **Devin** | Nothing to enter — reads your browser session, no keychain prompt | Daily and weekly quota reported by Devin. With no browser session or pasted credential, reads the app's dated saved plan. Endpoint failures use only matching endpoint cache, preserving account and organization boundaries ([Docs/providers/devin.md](Docs/providers/devin.md)) |
-| **Xiaomi Coding Plan** | Nothing to enter — reads your signed-in browser session, or paste a `Cookie:` header | The monthly token allowance from Xiaomi's MiMo console, with the period's end where it reports one. The prepaid balance rides along on the card. An account with no plan says so rather than drawing 0% ([Docs/providers/xiaomi-coding-plan.md](Docs/providers/xiaomi-coding-plan.md)) |
-
----
-
-## 🪟 Pulse for Windows (Native Port)
-
-### Overview
-This repository contains a full 1:1 native Windows port and fork of **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**. It recreates the fluid screen-edge experience, live quota monitoring, animated mascot physics, and developer tooling using native **C# 13, .NET 10, WPF, and Win32 / DWM integration**.
-
-### 📸 Windows Screenshots
-<p align="center">
-  <img src="Docs/images/windows-settings-general.png" width="48%" alt="Pulse Settings - General" />
-  &nbsp;
-  <img src="Docs/images/windows-settings-accounts.png" width="48%" alt="Pulse Settings - Accounts & Usage" />
-</p>
-<p align="center">
-  <img src="Docs/images/windows-floating-rail.png" height="340" alt="Screen-edge floating rail with BotMark mascot rings" />
-  <br>
-  <em>Screen-Edge Floating Capsule Dock with BotMark Animated Mascot Status Rings</em>
-</p>
-
-### ⚡ Quick Install (One Command)
 Install and run Pulse on Windows with a single PowerShell command:
+
 ```powershell
 irm https://raw.githubusercontent.com/yava-code/WinPulse/main/install.ps1 | iex
 ```
-*This downloads the latest release, installs it to `%LOCALAPPDATA%\Pulse`, creates Start Menu and Desktop shortcuts, and starts Pulse.*
 
-### 📦 Pre-built Binaries & Releases
-Download standalone or portable binaries directly from [GitHub Releases](https://github.com/yava-code/WinPulse/releases/latest):
+*What this does: downloads the latest standalone release from GitHub, installs to `%LOCALAPPDATA%\Pulse`, creates Start Menu and Desktop shortcuts, and launches Pulse immediately.*
+
+---
+
+## 📦 Download Releases
+
+Pre-built binaries are available under [GitHub Releases](https://github.com/yava-code/WinPulse/releases/latest):
 
 | Asset | Type | Description |
 | :--- | :--- | :--- |
-| **`Pulse.Windows.exe`** | **Standalone Single-File** | **Zero dependencies required!** Works immediately on any Windows 10/11 machine. |
-| **`Pulse-Windows-x64.zip`** | Standalone Archive | Portable distribution archive containing `Pulse.Windows.exe`. |
-| **`Pulse-Windows-x64-framework-dependent.zip`** | Lightweight Package (~2 MB) | For users with [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download) installed. |
+| **`Pulse.Windows.exe`** | **Standalone Portable** | **Zero dependencies required!** Self-contained single-file executable, ready to double-click and run on any Windows 10/11 machine. |
+| **`Pulse-Windows-x64.zip`** | Portable Archive | Complete portable package containing `Pulse.Windows.exe`. |
+| **`Pulse-Windows-x64-framework-dependent.zip`** | Lightweight Package (~2 MB) | For developers who already have [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download) installed. |
 
-### Windows-Specific Capabilities
-- **Desktop Window Manager (DWM) Integration**: Custom Win32 window styles (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`) ensure the floating capsule stays unobtrusively on top of your full-screen code editors without ever stealing active keyboard focus or breaking window state.
-- **Hardware Layered Alpha Compositing**: Uses zero-artifact transparent composition, avoiding rectangular bounding boxes or clipping glitches while supporting macOS Sequoia-style **Liquid Glass** frosted materials.
-- **BotMark Mascot Physics Engine**: Native vector port of the BotMark animated mascot face, reacting dynamically to quota status (Working, Quiet, Spent, Unavailable) with authentic squash-and-stretch eye/body kinematics.
-- **Windows DPAPI Credential Store**: Replaces macOS Keychain with hardware-backed Windows Data Protection API (`ProtectedData`), securely storing API keys and tokens scoped strictly to your Windows user account.
-- **Multi-Account Dynamic Discovery**: Automatically scans and detects Antigravity sessions, Claude Code, Cursor, Codex, and Copilot configs directly from local Windows developer paths (`%APPDATA%`, `%USERPROFILE%`).
-- **System Notification Area (Tray)**: Dedicated Windows system tray icon with one-click settings access, quota refresh, and rail visibility toggle in English.
-- **Guaranteed Process Lifecycle**: Clean single-instance enforcement kills previous hung background processes upon launch, exits cleanly with immediate process-tree cleanup, and supports `Ctrl+Q` global exit.
-- **Scriptable CLI Mode**: Run `Pulse.Windows.exe --json` for lightweight status bar integration (e.g. Komorebi, GlazeWM, Zebar, or custom PowerShell scripts) without running the GUI.
+---
 
-### 🛠️ Build & Commit Guide
+## 📸 Screenshots & Showcase
 
-#### Prerequisites
+<p align="center">
+  <img src="Docs/images/windows-settings-general.png" width="48%" alt="Pulse Windows Settings - General" />
+  &nbsp;
+  <img src="Docs/images/windows-settings-accounts.png" width="48%" alt="Pulse Windows Settings - Accounts & Usage" />
+</p>
+
+<p align="center">
+  <img src="Docs/images/windows-floating-rail.png" height="380" alt="Screen-edge floating rail with BotMark mascot rings" />
+  <br>
+  <em>Screen-edge floating rail with live BotMark status rings docked to your display edge</em>
+</p>
+
+<p align="center">
+  <img src="Docs/demo.gif" width="320" alt="Floating rail docked against the screen edge">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="Docs/bot-mark.gif" width="320" alt="BotMark animated mascot kinematics">
+</p>
+
+---
+
+## 🌟 What Makes Pulse Special
+
+Pulse is an unobtrusive floating monitor that docks neatly along the edge of your screen. It shows remaining allowances from the figures each service reports — using that product's own client routes, not a Pulse server — signed in as you already are, with nothing reported back. Every percentage on screen is a figure the service itself reported.
+
+### 🚀 Exclusive to this Fork: Antigravity Multi-Profile Support
+Unlike standard single-session monitors, this Windows port features full **multi-account discovery and management for Antigravity (Google)**:
+- **Multiple Concurrent Accounts**: Add and monitor multiple Google / Antigravity accounts simultaneously.
+- **Dedicated Quota Pools**: Tracks 5-hour limits (Claude/GPT, Gemini) and weekly quotas for each connected profile independently.
+- **Independent Rings & Status**: Display separate rings on the rail for each active account or switch seamlessly between profiles.
+- **Dynamic Local Discovery**: Automatically detects existing active sessions from `%USERPROFILE%` and `%APPDATA%` or securely links via Google OAuth.
+
+### 🎯 Core Features
+- **At-a-Glance Status Rings**: Dynamic color gradients shift from green to amber, red, and deep red as allowances deplete.
+- **BotMark Mascot Physics**: 1:1 vector implementation of the BotMark animated mascot face reacting with squash-and-stretch kinematics to agent activity and quota cooldowns.
+- **Hover Detail Cards**: Hover over any status ring to reveal full pool breakdowns, reset countdowns, and window states.
+- **Accurate Proportional Progress**: Perfectly calibrated progress tracks ensuring 100% exhaustion fills 100% of the bar across all Windows display scaling modes (100%, 125%, 150%, 175%, 200%).
+- **Fluid Screen-Edge Docking**: Dock to the right or left edge of any screen, or let it float freely. Automatically folds into an ultra-thin sliver bar until pointed at.
+- **Multi-Monitor Aware**: Automatically tracks the active monitor or stays anchored to your preferred display.
+- **Liquid Glass & Obsidian Themes**: Native DirectX layered alpha compositing for frosted glass aesthetics without window clipping or rectangular visual artifacts.
+- **Windows DPAPI Security**: Credentials, API tokens, and session secrets are encrypted using the Windows Data Protection API (`ProtectedData`), hardware-backed and scoped strictly to your user profile.
+- **Rock-Solid Lifecycle**: Kills old zombie/hung background instances upon start, and forcibly cleans up its process tree upon exit (`Ctrl+Q`, tray exit, or Settings quit).
+- **English System Tray Integration**: Right-click the notification area icon for quick settings, quota refresh, and rail visibility controls.
+- **CLI & Scripting Mode**: Run `Pulse.Windows.exe --json` for lightweight terminal status bars (Komorebi, GlazeWM, Zebar, or custom PowerShell scripts) without running the GUI.
+
+---
+
+## 🔌 Supported Providers
+
+| Provider | Authentication & Discovery | Monitored Quota |
+| :--- | :--- | :--- |
+| **Antigravity** | **Multi-Profile** Google OAuth or local token | 5-hour limit (Claude & GPT), 5-hour limit (Gemini), Weekly quotas |
+| **Claude Code** | Local credentials (`~/.claude`) | 5-hour and 7-day allowances, active turn indicator |
+| **OpenAI Codex** | Local config or ChatGPT session | 5-hour allowance, active agent turn indicator |
+| **Cursor** | Local editor session storage | Fast request allowance & subscription usage |
+| **GitHub Copilot** | GitHub Device Code authentication | Premium request allowance & model pool |
+| **DeepSeek** | Direct API key | Real-time balance and usage tracking |
+| **Grok / Grok Bot** | Browser session / token | Rate limits and message pool allowances |
+| **Devin** | Local browser session / state | Daily and weekly usage allowances |
+| **Kimi Code** | Direct API key | Token allowances and rate limits |
+| **MiniMax** | Direct API key | International & mainland storefronts |
+| **Ollama Cloud** | Local browser session | Cloud allowance and quota tracking |
+
+---
+
+## 🛠️ Build & Development Guide
+
+### Prerequisites
 - Windows 10 (1809+) or Windows 11 (x64 / ARM64)
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
 
-#### 1-Command Local Build
+### 1-Command Local Build
+Use the included automated build script from the repository root:
+
 ```powershell
 # Build standalone self-contained executable & zip into dist/
 .\build.ps1
@@ -190,7 +136,7 @@ Download standalone or portable binaries directly from [GitHub Releases](https:/
 .\build.ps1 -FrameworkDependent
 ```
 
-#### Manual dotnet CLI Build & Test
+### Manual dotnet CLI Build & Test
 ```powershell
 # 1. Restore dependencies
 dotnet restore Windows/Pulse.slnx
@@ -202,7 +148,7 @@ dotnet test Windows/Pulse.slnx
 dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist/
 ```
 
-#### Command Line Options
+### Command Line Options
 ```powershell
 # Print current cached quota readings as JSON (zero background overhead)
 .\dist\Pulse.Windows.exe --json
@@ -214,94 +160,40 @@ dotnet publish Windows/Pulse.Windows/Pulse.Windows.csproj -c Release -r win-x64 
 .\dist\Pulse.Windows.exe --minimized
 ```
 
-#### Commits & Releases
-1. **Commit Changes**: Use semantic commit messages:
-   ```powershell
-   git add .
-   git commit -m "feat: add feature description"
-   git push winpulse main
-   ```
-2. **Tag a Release**: Pushing a version tag automatically triggers GitHub Actions to build standalone and lightweight release binaries and attach them to GitHub Releases:
-   ```powershell
-   git tag -a v1.0.0 -m "Release v1.0.0"
-   git push winpulse v1.0.0
-   ```
-
 ---
 
-## Installation (macOS)
+## 🏷️ Commits & Release Guide
 
-1. Download the latest **`Pulse-x.y.z.dmg`** from [Releases](https://github.com/qunqin24/Pulse/releases/latest).
-2. Open the disk image and drag **Pulse** into your `Applications` folder.
-3. On first launch, choose the services to monitor. All start unchecked; Pulse reads their credentials and checks usage only after you click **Done**. Closing the chooser leaves monitoring off; you can also enable a service in Settings. Upgrades keep your choices and ask once about newly supported services detected on your Mac.
-4. Pulse lives in the menu bar. If your menu bar is crowded, right-click the floating rail — or the collapsed sliver — and choose **Settings…**; you can also assign a global shortcut for it under **Settings › General › Shortcuts**.
+### Commit Message Conventions
+We follow Conventional Commits:
+- `feat: add new provider support`
+- `fix: resolve liquid glass clipping on secondary monitor`
+- `docs: update installation instructions and screenshots`
 
-> [!NOTE]
-> **macOS Gatekeeper First Launch**:<br>
-> Pulse is an open-source project without an Apple Developer certificate. On first launch, macOS may block the app:
-> - **Option 1 (GUI)**: Launch Pulse, dismiss the alert, open **System Settings → Privacy & Security**, and click **Open Anyway**.
-> - **Option 2 (Terminal)**:
->   ```bash
->   xattr -cr /Applications/Pulse.app
->   ```
->   *Updates are offered in-app through Sparkle. macOS may request browser keychain access again after an update.*
-
----
-
-## Privacy & Security
-
-Pulse is designed with strict local-first security principles:
-- **No Pulse backend**: Your Mac talks to the providers you already use, under your own logins. It also fetches public model prices from [models.dev](https://models.dev) for the token-spend pane and checks GitHub/Sparkle for app updates. Provider requests, sign-in exchanges and models.dev use the proxy chosen under Settings › General › Network; supported helper processes receive the same manual proxy. Sparkle update checks always follow macOS system proxy settings.
-- **Local Credentials**: Reads credentials already stored locally by your development tools (`~/.claude`, `~/.codex`, Cursor storage, etc.) where that is how the product works; some providers need a key or sign-in you enter in Settings.
-- **Encrypted Local Storage**: Manually entered API keys and session tokens are encrypted and saved strictly in Pulse's local application directory with owner-only permissions.
-- **Local Usage Records**: Pulse reads transcripts, databases and exports to obtain token counts and session metadata such as titles and working directories. These records may contain conversation text; processing stays on your Mac and the records stay with it. Pulse reads those records and nothing else.
-
----
-
-## Build from Source
-
-Pulse is built with native Swift and SwiftUI. Building the current sources needs the full **Xcode** (not the Command Line Tools), including the **macOS 26 SDK**; the app runs on **macOS 14+**.
-
-```bash
-# Clone the repository
-git clone https://github.com/qunqin24/Pulse.git
-cd Pulse
-
-# Build the app bundle
-./Scripts/bundle.sh
-
-# Launch it
-open build.noindex/Pulse.app
+### Pushing Changes
+```powershell
+git add .
+git commit -m "feat: your descriptive message"
+git push winpulse main
 ```
 
-`swift run Pulse` is a quick way to build and run without a bundle, but notifications and in-app updates only work from the bundled app. See [Docs/build-from-source.md](Docs/build-from-source.md) for toolchain setup. Shipping a release: [Docs/releasing.md](Docs/releasing.md).
+### Triggering an Automated GitHub Release
+Pushing a semantic version tag triggers the GitHub Actions release workflow:
+
+```powershell
+# 1. Tag the release
+git tag -a v1.0.0 -m "Release v1.0.0"
+
+# 2. Push tag to GitHub
+git push winpulse v1.0.0
+```
+*GitHub Actions will automatically build the standalone single-file `Pulse.Windows.exe`, package `Pulse-Windows-x64.zip`, and publish the GitHub Release.*
 
 ---
 
-## Contributing
+## 📜 Attribution & License
 
-How the repo is documented, what must not regress, and how to update the right page: [CONTRIBUTING.md](CONTRIBUTING.md). Map of topic docs: [Docs/README.md](Docs/README.md).
-
----
-
-## Design Attribution
-
-Pulse was inspired by a UI concept shared by [**Vinz** (@hivinz_)](https://x.com/hivinz_/status/2092996055248126353) on X in August 2026. Pulse is an independent implementation with its own interactions, functionality, animations, and visual details. Vinz is not affiliated with or responsible for Pulse.
-
----
-
-## License
-
-Licensed under [Apache 2.0](LICENSE). Bundled third-party assets retain their respective licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
----
-
-## Star History
-
-<a href="https://star-history.com/#qunqin24/Pulse&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=qunqin24/Pulse&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=qunqin24/Pulse&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=qunqin24/Pulse&type=Date" />
-  </picture>
-</a>
+- **Windows Port & Fork**: Maintained in [yava-code/WinPulse](https://github.com/yava-code/WinPulse).
+- **Original macOS Application**: Created by [qunqin24](https://github.com/qunqin24) at [qunqin24/Pulse](https://github.com/qunqin24/Pulse).
+- **UI Design Concept**: Inspired by [Vinz (@hivinz_)](https://x.com/hivinz_).
+- **License**: Licensed under [Apache 2.0](LICENSE).
