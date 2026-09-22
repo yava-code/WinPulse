@@ -112,3 +112,27 @@ jobs:
           done
           echo "Version: $(defaults read "$PWD/$APP/Contents/Info.plist" CFBundleShortVersionString)"
           echo "Architectures: $(lipo -archs "$APP/Contents/MacOS/Pulse")"
+
+  build-windows:
+    name: Windows Build & Test (.NET 10)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Add NuGet source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+
+      - name: Restore dependencies
+        run: dotnet restore Windows/Pulse.slnx
+
+      - name: Build solution
+        run: dotnet build Windows/Pulse.slnx --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: dotnet test Windows/Pulse.slnx --configuration Release --no-build --verbosity normal

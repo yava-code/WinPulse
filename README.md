@@ -9,20 +9,24 @@
   Real-time remaining quotas and rate limits for Claude Code, Codex, Cursor, GitHub Copilot, Antigravity, Grok, and more.
 </p>
 
+> [!IMPORTANT]
+> ### 🪟 Windows Port & Fork Notice
+> This repository is a native Windows port and fork of the original macOS project **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**.
+> It brings the entire Pulse experience (floating screen-edge dock, animated BotMark mascot rings, live rate limit monitoring, and multi-account token spend) to **Microsoft Windows 10 & 11** built with **C# / .NET 10 & WPF**.
+> 
+> 👉 **[Jump to Windows Port Documentation & Build Guide](#-pulse-for-windows-native-port)**
+
 <p align="center">
-  <a href="https://github.com/qunqin24/Pulse/releases/latest"><img src="https://img.shields.io/github/v/release/qunqin24/Pulse?color=black" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-0078D6?logo=windows&logoColor=white" alt="Windows 10/11">
+  <img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white" alt=".NET 10.0">
+  <img src="https://img.shields.io/badge/WPF-Desktop-0078D6" alt="WPF">
   <img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma-333333?logo=apple" alt="macOS 14+">
-  <a href="https://github.com/qunqin24/Pulse/actions/workflows/ci.yml"><img src="https://github.com/qunqin24/Pulse/actions/workflows/ci.yml/badge.svg" alt="CI Build"></a>
-  <img src="https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white" alt="Swift 6.0">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License"></a>
-  <a href="https://github.com/qunqin24/Pulse/stargazers"><img src="https://img.shields.io/github/stars/qunqin24/Pulse?color=black" alt="GitHub Stars"></a>
-  <a href="https://github.com/qunqin24/Pulse/releases"><img src="https://img.shields.io/github/downloads/qunqin24/Pulse/total?color=black" alt="Downloads"></a>
-  <a href="https://github.com/qunqin24/Pulse/issues"><img src="https://img.shields.io/github/issues/qunqin24/Pulse?color=black" alt="Open Issues"></a>
-  <a href="https://github.com/qunqin24/Pulse/commits/main"><img src="https://img.shields.io/github/last-commit/qunqin24/Pulse?color=black" alt="Last Commit"></a>
+  <a href="https://github.com/qunqin24/Pulse"><img src="https://img.shields.io/badge/Upstream-qunqin24%2FPulse-orange" alt="Upstream Repository"></a>
 </p>
 
 <p align="center">
-  <sub><b>macOS 14 Sonoma or newer</b> · Apple Silicon & Intel Universal · <b>English</b> · <a href="README.zh-CN.md"><b>简体中文</b></a> · <a href="README.zh-Hant.md"><b>繁體中文</b></a> · <a href="README.ja.md"><b>日本語</b></a> · <a href="README.ko.md"><b>한국어</b></a></sub>
+  <sub><b>Native Windows 10/11 (.NET 10 / WPF)</b> & <b>macOS 14+ Sonoma (Swift 6)</b> · <b>English</b> · <a href="README.zh-CN.md"><b>简体中文</b></a> · <a href="README.zh-Hant.md"><b>繁體中文</b></a> · <a href="README.ja.md"><b>日本語</b></a> · <a href="README.ko.md"><b>한국어</b></a></sub>
 </p>
 
 <p align="center">
@@ -128,7 +132,54 @@ Pulse shows the figures each service reports, and every percentage comes from th
 
 ---
 
-## Installation
+## 🪟 Pulse for Windows (Native Port)
+
+### Overview
+This repository contains a full 1:1 native Windows port of **[Pulse by qunqin24](https://github.com/qunqin24/Pulse)**. It recreates the fluid screen-edge experience, live quota monitoring, animated mascot physics, and developer tooling using native **C# 13, .NET 10, WPF, and Win32 / DWM integration**.
+
+### Windows-Specific Capabilities
+- **Desktop Window Manager (DWM) Integration**: Custom Win32 window styles (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`) ensure the floating capsule stays unobtrusively on top of your full-screen code editors without ever stealing active keyboard focus or breaking window state.
+- **Hardware Layered Alpha Compositing**: Uses zero-artifact transparent composition, avoiding rectangular bounding boxes or clipping glitches while supporting macOS Sequoia-style **Liquid Glass** frosted materials.
+- **BotMark Mascot Physics Engine**: Native vector port of the BotMark animated mascot face, reacting dynamically to quota status (Working, Quiet, Spent, Unavailable) with authentic squash-and-stretch eye/body kinematics.
+- **Windows DPAPI Credential Store**: Replaces macOS Keychain with hardware-backed Windows Data Protection API (`ProtectedData`), securely storing API keys and tokens scoped strictly to your Windows user account.
+- **Multi-Account Dynamic Discovery**: Automatically scans and detects Antigravity sessions, Claude Code, Cursor, Codex, and Copilot configs directly from local Windows developer paths (`%APPDATA%`, `%USERPROFILE%`).
+- **System Notification Area (Tray)**: Dedicated Windows system tray icon with one-click settings access, quota refresh, and rail visibility toggle.
+- **Guaranteed Process Lifecycle**: Clean single-instance enforcement kills previous hung background processes upon launch, exits cleanly with immediate process-tree cleanup, and supports `Ctrl+Q` global exit.
+- **Scriptable CLI Mode**: Run `Pulse.Windows.exe --json` for lightweight status bar integration (e.g. Komorebi, GlazeWM, Zebar, or custom PowerShell scripts) without running the GUI.
+
+### Windows Build & Run
+
+#### Prerequisites
+- Windows 10 (1809+) or Windows 11 (x64 / ARM64)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
+
+#### Quick Start
+```powershell
+# 1. Navigate to the Windows port directory
+cd Windows
+
+# 2. Build Release binary
+dotnet build Pulse.Windows/Pulse.Windows.csproj -c Release
+
+# 3. Run all automated unit tests (34 tests passing)
+dotnet test Pulse.Tests/Pulse.Tests.csproj
+
+# 4. Launch Pulse
+dotnet run --project Pulse.Windows/Pulse.Windows.csproj
+```
+
+#### Command Line Options
+```powershell
+# Print current cached quota readings as JSON (zero background overhead)
+.\bin\Release\net10.0-windows\Pulse.Windows.exe --json
+
+# Launch in console debug mode to inspect real-time provider sync logs
+.\bin\Release\net10.0-windows\Pulse.Windows.exe --debug
+```
+
+---
+
+## Installation (macOS)
 
 1. Download the latest **`Pulse-x.y.z.dmg`** from [Releases](https://github.com/qunqin24/Pulse/releases/latest).
 2. Open the disk image and drag **Pulse** into your `Applications` folder.

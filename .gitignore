@@ -27,3 +27,11 @@ Integrations/raycast/raycast-env.d.ts
 # IDEs
 .idea/
 .vscode/
+
+# .NET Build Artifacts
+**/[Bb]in/
+**/[Oo]bj/
+*.user
+*.suo
+*.slnx.sqlite
+*_wpftmp.csproj
