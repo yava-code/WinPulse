@@ -24,30 +24,32 @@ public class AntigravityMultiAccountTests
     }
 
     [Fact]
-    public async Task DiscoverAccounts_FindsBothYasenvarfAndMurderinerd()
+    public async Task DiscoverAccounts_ReturnsNonEmptyAntigravityAccounts()
     {
         var paths = new TestPaths();
         var service = new AntigravityUsageService(paths);
 
         var accounts = await service.DiscoverAccountsAsync();
         Assert.NotEmpty(accounts);
-
-        var emails = accounts.Select(a => a.Id).ToList();
-        Assert.Contains(emails, e => e.Contains("yasenvarf@gmail.com", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(emails, e => e.Contains("murderinerd@gmail.com", StringComparison.OrdinalIgnoreCase));
+        Assert.All(accounts, account =>
+        {
+            Assert.Equal(Provider.Antigravity, account.Provider);
+            Assert.False(string.IsNullOrWhiteSpace(account.Id));
+        });
     }
 
     [Fact]
-    public async Task FetchAsync_ReturnsLiveQuotasForAccounts()
+    public async Task FetchAsync_UnknownAccountWithoutSession_ReturnsUnavailable()
     {
         var paths = new TestPaths();
         var service = new AntigravityUsageService(paths);
 
-        var account = new AccountKey(Provider.Antigravity, "antigravity#yasenvarf@gmail.com");
+        var account = new AccountKey(Provider.Antigravity, $"antigravity#ci-{Guid.NewGuid():N}@invalid.example");
         var usage = await service.FetchAsync(account);
 
-        Assert.Equal(UsageState.Live, usage.State);
-        Assert.NotEmpty(usage.Windows);
-        Assert.Null(usage.UnavailabilityReason);
+        Assert.Equal(account, usage.Account);
+        Assert.Equal(UsageState.Unavailable, usage.State);
+        Assert.Empty(usage.Windows);
+        Assert.False(string.IsNullOrWhiteSpace(usage.UnavailabilityReason));
     }
 }
